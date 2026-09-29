@@ -3,6 +3,7 @@ Streamlit Application for Mobile Money Fraud Detection
 Dashboard with Real-Time Monitoring, Fraud Alerts, and Analytics
 """
 
+from database import init_db, log_anomaly, get_all_logs, clear_logs
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
@@ -32,6 +33,7 @@ from ui.styles import load_custom_css
 DATA_DIR = "data"
 DEFAULT_TEST_DATA_PATH = os.path.join(DATA_DIR, "test_data.csv")
 
+init_db()  # Ensure database is initialized at app startup
 
 # Page configuration
 st.set_page_config(
@@ -796,7 +798,7 @@ def real_time_monitor():
         # Simulation controls
         col1, col2 = st.columns([1, 1])
         
-        # 🔧 FIX: Use 0.21 as default threshold (matches Batch Analysis working threshold)
+        # FIX: Use 0.21 as default threshold (matches Batch Analysis working threshold)
         suggested_threshold = 0.21  # Override model default to use empirically calibrated value
 
         with col1:
@@ -839,7 +841,7 @@ def real_time_monitor():
                 n=min(num_transactions, len(df_test))
             ).reset_index(drop=True)
 
-            # 🔧 BATCH PREPROCESSING: Process ALL transactions upfront using fixed pipeline
+            # BATCH PREPROCESSING: Process ALL transactions upfront using fixed pipeline
             with st.spinner("Preprocessing transactions..."):
                 # Use the EXACT same pipeline as Batch Analysis
                 X_batch, _, df_batch_processed = preprocess_data(
@@ -1049,7 +1051,7 @@ def batch_analysis():
             st.session_state.analysis_runs += 1
             ensure_models_ready(df)
 
-            # 🔧 CORRECTED PREPROCESSING AND PREDICTION PIPELINE
+            # CORRECTED PREPROCESSING AND PREDICTION PIPELINE
             with st.spinner("Processing transactions..."):
                 # Step 1: Preprocess using TRANSFORM ONLY (never fit)
                 X_processed, _, df_processed = preprocess_data(
@@ -1064,7 +1066,7 @@ def batch_analysis():
                     )
                 )
 
-            # 🔍 DIAGNOSTIC PANEL - Add before displaying results
+            # DIAGNOSTIC PANEL - Add before displaying results
             with st.expander("Model Diagnostics", expanded=False):
                 st.write("#### Scaled Features of Row 0:")
                 st.code(X_processed[0])

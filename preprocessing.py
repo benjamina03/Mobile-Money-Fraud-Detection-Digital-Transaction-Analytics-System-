@@ -83,14 +83,14 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     # Perform one-hot encoding
     df = pd.get_dummies(df, columns=["type"], prefix="type")
 
-    # 🔧 CRITICAL FIX: Ensure ALL type columns exist in EXACT order
+    # CRITICAL FIX: Ensure ALL type columns exist in EXACT order
     # Even if a category wasn't present in this batch, add it with zeros
     for trans_type in all_types:
         col_name = f"type_{trans_type}"
         if col_name not in df.columns:
             df[col_name] = 0
 
-    # 🔧 FORCE COLUMN ORDER: Reorder type columns to match training order
+    # FORCE COLUMN ORDER: Reorder type columns to match training order
     # This ensures inference always matches the scaler's expected input
     type_cols_ordered = [f"type_{t}" for t in all_types]
     non_type_cols = [col for col in df.columns if not col.startswith("type_")]
@@ -117,7 +117,7 @@ def select_features(
         DataFrame with selected features in EXACT order
     """
     if feature_columns is None:
-        # 🔧 DEFAULT FEATURE SET - MATCHES TRAINING ORDER EXACTLY
+        # DEFAULT FEATURE SET - MATCHES TRAINING ORDER EXACTLY
         # This order MUST match what the scaler was trained on
         feature_columns = [
             # Numerical features
@@ -140,10 +140,10 @@ def select_features(
             "type_TRANSFER",
         ]
 
-    # 🔧 STRICT VALIDATION: Only select columns that exist
+    # STRICT VALIDATION: Only select columns that exist
     available_features = [col for col in feature_columns if col in df.columns]
 
-    # 🔧 SAFETY CHECK: Warn if critical features are missing
+    # SAFETY CHECK: Warn if critical features are missing
     missing_features = [col for col in feature_columns if col not in df.columns]
     if missing_features:
         import warnings
